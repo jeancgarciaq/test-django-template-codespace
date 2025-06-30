@@ -1,0 +1,72 @@
+{
+  "name": "Proyecto Django con PostgreSQL",
+  // Utiliza una imagen base de Dev Containers con Python, que ya incluye Git, Node.js y otras utilidades comunes
+  "image": "mcr.microsoft.com/devcontainers/python:3.11", 
+  
+  // Añade características adicionales a la imagen base
+  "features": {
+    // Instala PostgreSQL Client Utilities
+    "ghcr.io/devcontainers/features/postgresql:1": {
+      "version": "15" 
+    },
+    // Añade el CLI de GitHub, muy útil para interactuar con GitHub desde la terminal del Codespace
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    //Actualiza a última versión Django
+    "ghcr.io/hspaans/devcontainer-features/django-upgrade:2": {}
+  },
+
+  // Configuración específica para VS Code dentro del Codespace
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python", // Extensión oficial de Python
+        "ms-python.vscode-pylance", // Para análisis de código Python
+        "bungcip.better-toml", // Para archivos pyproject.toml o similares
+        "batisteo.vscode-django", // Ayudas específicas para Django
+        "formulahendry.vscode-auto-rename-tag", // Renombra tags HTML/Django automáticamente
+        "esbenp.prettier-vscode" // Formateador de código
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.testing.pytestEnabled": true,
+        "editor.formatOnSave": true
+      }
+    }
+  },
+
+  // Comandos que se ejecutan UNA VEZ después de que el Codespace se crea
+  "postCreateCommand": {
+    "install_dependencies": "pip install -r requirements.txt",
+    "run_migrations": "python manage.py migrate"
+  },
+
+  // Comandos que se ejecutan CADA VEZ que el Codespace se inicia o se reanuda
+  "postStartCommand": "python manage.py runserver 0.0.0.0:8000",
+
+  // Define cómo se manejan los puertos
+  "portsAttributes": {
+    "8000": {
+      "label": "Aplicación Django",
+      "onAutoForward": "openBrowser" // Abre el puerto 8000 en el navegador automáticamente
+    },
+    "5432": { // Puerto por defecto de PostgreSQL
+      "label": "Base de Datos PostgreSQL",
+      "onAutoForward": "notify" // Notifica que el puerto está disponible, pero no lo abre
+    }
+  },
+
+  // Especifica los puertos que siempre deben reenviarse a tu máquina local (si conectas desde VS Code Desktop)
+  "forwardPorts": [8000, 5432],
+
+  // Variables de entorno para el contenedor
+  "remoteEnv": {
+    "DJANGO_SETTINGS_MODULE": "myproject.settings",
+    "DATABASE_URL": "postgresql://postgres:postgres@localhost:5432/postgres" // Configura tus credenciales aquí, o usa un archivo .env
+  },
+  
+  // Puedes usar Docker Compose para configurar servicios adicionales como bases de datos
+  // Si usaras docker-compose.yml en lugar de solo la feature de postgres
+  // "dockerComposeFile": "docker-compose.yml",
+  // "service": "app", // El servicio principal que contiene tu código Django
+  // "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}"
+}
